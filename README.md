@@ -2300,3 +2300,5 @@ The project now additionally demonstrates:
 - Approximately 85% overall automated test coverage
 
 The application therefore demonstrates not only REST, SOAP, persistence, exception handling, transaction management, and AOP, but also a layered automated testing strategy covering both isolated components and integrated application behavior.
+
+CI/CD pipeline configured with Jenkins.
