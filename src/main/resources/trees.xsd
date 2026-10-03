@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://testSpring.com/trees"
+    targetNamespace="http://testSpring.com/trees"
+    elementFormDefault="qualified">
+
+    <!-- ========================= -->
+    <!-- TREE -->
+    <!-- ========================= -->
+
+    <xs:complexType name="tree">
+        <xs:sequence>
+
+            <xs:element
+                name="id"
+                type="xs:int"/>
+
+            <xs:element
+                name="name"
+                type="xs:string"
+                minOccurs="0"/>
+
+            <xs:element
+                name="category"
+                type="xs:string"
+                minOccurs="0"/>
+
+            <xs:element
+                name="branches"
+                type="xs:string"
+                minOccurs="0"
+                maxOccurs="unbounded"/>
+
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- ========================= -->
+    <!-- GET ONE TREE -->
+    <!-- ========================= -->
+
+    <xs:element name="getTreeRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="id"
+                    type="xs:int"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="getTreeResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="0"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- GET ALL TREES -->
+    <!-- ========================= -->
+
+    <xs:element name="getAllTreesRequest">
+
+        <xs:complexType>
+            <xs:sequence/>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="getAllTreesResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="0"
+                    maxOccurs="unbounded"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- ADD TREE -->
+    <!-- ========================= -->
+
+    <xs:element name="addTreeRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="addTreeResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- ADD MULTIPLE TREES -->
+    <!-- ========================= -->
+
+    <xs:element name="addMultipleTreesRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="1"
+                    maxOccurs="unbounded"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="addMultipleTreesResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="0"
+                    maxOccurs="unbounded"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- UPDATE TREE -->
+    <!-- ========================= -->
+
+    <xs:element name="updateTreeRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="id"
+                    type="xs:int"/>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="updateTreeResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="0"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- PATCH TREE -->
+    <!-- ========================= -->
+
+    <xs:element name="patchTreeRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="id"
+                    type="xs:int"/>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="patchTreeResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="tree"
+                    type="tns:tree"
+                    minOccurs="0"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <!-- ========================= -->
+    <!-- DELETE TREE -->
+    <!-- ========================= -->
+
+    <xs:element name="deleteTreeRequest">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="id"
+                    type="xs:int"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+
+    <xs:element name="deleteTreeResponse">
+
+        <xs:complexType>
+            <xs:sequence>
+
+                <xs:element
+                    name="success"
+                    type="xs:boolean"/>
+
+                <xs:element
+                    name="message"
+                    type="xs:string"/>
+
+            </xs:sequence>
+        </xs:complexType>
+
+    </xs:element>
+
+</xs:schema>

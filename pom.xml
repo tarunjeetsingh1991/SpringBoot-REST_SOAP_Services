@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ========================================= -->
+    <!-- SPRING BOOT PARENT                       -->
+    <!-- ========================================= -->
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.5</version>
+        <relativePath/>
+    </parent>
+
+
+    <!-- ========================================= -->
+    <!-- PROJECT INFORMATION                      -->
+    <!-- ========================================= -->
+
+    <groupId>com.testSpring</groupId>
+    <artifactId>TestSpringPersistent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>TestSpringPersistent</name>
+
+    <description>
+        Spring Boot application supporting REST and SOAP APIs
+    </description>
+
+
+    <!-- ========================================= -->
+    <!-- PROPERTIES                               -->
+    <!-- ========================================= -->
+
+    <properties>
+
+        <java.version>17</java.version>
+
+    </properties>
+
+
+    <!-- ========================================= -->
+    <!-- DEPENDENCIES                             -->
+    <!-- ========================================= -->
+
+    <dependencies>
+
+
+        <!-- ===================================== -->
+        <!-- SPRING DATA JPA                      -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- REST API                             -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- SOAP / SPRING WEB SERVICES           -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- WSDL SUPPORT                         -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>wsdl4j</groupId>
+            <artifactId>wsdl4j</artifactId>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- MYSQL                                -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- SPRING BOOT DEVTOOLS                 -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!-- ===================================== -->
+        <!-- LOMBOK                               -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Spring AOP -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+
+        <!-- ===================================== -->
+        <!-- TESTING                              -->
+        <!-- ===================================== -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!-- ========================================= -->
+    <!-- BUILD                                    -->
+    <!-- ========================================= -->
+
+    <build>
+
+        <plugins>
+
+
+            <!-- ================================= -->
+            <!-- MAVEN COMPILER                   -->
+            <!-- ================================= -->
+
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <configuration>
+
+                    <annotationProcessorPaths>
+
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+
+                    </annotationProcessorPaths>
+
+                </configuration>
+
+            </plugin>
+
+
+            <!-- ================================= -->
+            <!-- SPRING BOOT MAVEN PLUGIN         -->
+            <!-- ================================= -->
+
+            <plugin>
+
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+
+                <configuration>
+
+                    <excludes>
+
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+
+                    </excludes>
+
+                </configuration>
+
+            </plugin>
+
+
+            <!-- ================================= -->
+            <!-- JAXB                             -->
+            <!--                                  -->
+            <!-- Generates Java SOAP DTO classes  -->
+            <!-- from trees.xsd                   -->
+            <!-- ================================= -->
+
+            <plugin>
+
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.2.0</version>
+
+                <executions>
+
+                    <execution>
+
+                        <id>xjc</id>
+
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+
+                    </execution>
+
+                </executions>
+
+
+                <configuration>
+
+                    <!--
+                        Location of our SOAP XSD.
+
+                        project.basedir means the directory
+                        containing this pom.xml.
+                    -->
+
+                    <sources>
+
+                        <source>
+                            ${project.basedir}/src/main/resources/trees.xsd
+                        </source>
+
+                    </sources>
+
+
+                    <!--
+                        Package for generated Java classes.
+
+                        Example:
+                        GetTreeRequest.java
+                        GetTreeResponse.java
+                        Tree.java
+                        AddTreeRequest.java
+                        etc.
+                    -->
+
+                    <packageName>
+                        com.testSpring.soap.generated
+                    </packageName>
+
+
+                    <!--
+                        Generated Java source location
+                    -->
+
+                    <outputDirectory>
+                        ${project.build.directory}/generated-sources/jaxb
+                    </outputDirectory>
+
+
+                    <!--
+                        Do not unnecessarily delete generated
+                        output before every execution.
+                    -->
+
+                    <clearOutputDir>false</clearOutputDir>
+
+                </configuration>
+
+            </plugin>
+			
+			<plugin>
+			    <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			    <version>0.8.14</version>
+			
+			    <executions>
+			
+			        <execution>
+			            <goals>
+			                <goal>prepare-agent</goal>
+			            </goals>
+			        </execution>
+			
+			        <execution>
+			            <id>report</id>
+			
+			            <phase>test</phase>
+			
+			            <goals>
+			                <goal>report</goal>
+			            </goals>
+			        </execution>
+			
+			    </executions>
+			</plugin>
+
+        </plugins>
+
+    </build>
+
+
+</project>

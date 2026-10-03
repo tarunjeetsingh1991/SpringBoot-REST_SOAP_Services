@@ -1,0 +1,224 @@
+{
+  "info": {
+    "_postman_id": "4d22e3e0-b13f-4e75-b5cf-resttrees001",
+    "name": "TestSpringPersistent - REST API",
+    "description": "REST API collection for the TreeController in TestSpringPersistent.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Home",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/home",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "home"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Trees",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/all",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "all"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Tree By ID",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/all/101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "all",
+            "101"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Tree",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/add",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "add"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1001,\n  \"name\": \"Maple\",\n  \"category\": \"Deciduous\",\n  \"branches\": [\n    \"Main Branch\",\n    \"Upper Branch\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Add Multiple Trees",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/addAll",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "addAll"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "[\n  {\n    \"id\": 1101,\n    \"name\": \"Pine\",\n    \"category\": \"Evergreen\",\n    \"branches\": [\n      \"North Branch\",\n      \"South Branch\"\n    ]\n  },\n  {\n    \"id\": 1201,\n    \"name\": \"Birch\",\n    \"category\": \"Deciduous\",\n    \"branches\": [\n      \"Left Branch\",\n      \"Right Branch\"\n    ]\n  }\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Update Tree",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/update/101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "update",
+            "101"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 101,\n  \"name\": \"Updated Tree\",\n  \"category\": \"Updated Category\",\n  \"branches\": [\n    \"Updated Branch-1\",\n    \"Updated Branch-2\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Patch Tree",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/patch/101",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "patch",
+            "101"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Patched Tree Name\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Delete Tree",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/delete/1001",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "delete",
+            "1001"
+          ]
+        }
+      }
+    }
+  ]
+}

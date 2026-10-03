@@ -1,0 +1,226 @@
+{
+  "info": {
+    "_postman_id": "a581a0f5-4af6-4f60-9f41-soaptrees001",
+    "name": "TestSpringPersistent - SOAP API",
+    "description": "SOAP API collection for TreeEndpoint. All operations use POST /ws with SOAP XML bodies.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get Tree By ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:getTreeRequest>\n            <tre:id>101</tre:id>\n        </tre:getTreeRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Trees",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:getAllTreesRequest/>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Tree",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:addTreeRequest>\n            <tre:tree>\n                <tre:id>1001</tre:id>\n                <tre:name>Maple</tre:name>\n                <tre:category>Deciduous</tre:category>\n                <tre:branches>Main Branch</tre:branches>\n                <tre:branches>Upper Branch</tre:branches>\n            </tre:tree>\n        </tre:addTreeRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Multiple Trees",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:addMultipleTreesRequest>\n            <tre:tree>\n                <tre:id>1101</tre:id>\n                <tre:name>Pine</tre:name>\n                <tre:category>Evergreen</tre:category>\n                <tre:branches>North Branch</tre:branches>\n                <tre:branches>South Branch</tre:branches>\n            </tre:tree>\n            <tre:tree>\n                <tre:id>1201</tre:id>\n                <tre:name>Birch</tre:name>\n                <tre:category>Deciduous</tre:category>\n                <tre:branches>Left Branch</tre:branches>\n                <tre:branches>Right Branch</tre:branches>\n            </tre:tree>\n        </tre:addMultipleTreesRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Update Tree",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:updateTreeRequest>\n            <tre:id>101</tre:id>\n            <tre:tree>\n                <tre:id>101</tre:id>\n                <tre:name>Updated Tree</tre:name>\n                <tre:category>Updated Category</tre:category>\n                <tre:branches>Updated Branch-1</tre:branches>\n                <tre:branches>Updated Branch-2</tre:branches>\n            </tre:tree>\n        </tre:updateTreeRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Patch Tree",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:patchTreeRequest>\n            <tre:id>101</tre:id>\n            <tre:tree>\n                <tre:name>Patched Tree Name</tre:name>\n            </tre:tree>\n        </tre:patchTreeRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Delete Tree",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/xml"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n                  xmlns:tre=\"http://testSpring.com/trees\">\n    <soapenv:Header/>\n    <soapenv:Body>\n        <tre:deleteTreeRequest>\n            <tre:id>1001</tre:id>\n        </tre:deleteTreeRequest>\n    </soapenv:Body>\n</soapenv:Envelope>",
+          "options": {
+            "raw": {
+              "language": "xml"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ws",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "ws"
+          ]
+        }
+      }
+    }
+  ]
+}
