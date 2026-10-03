@@ -1438,3 +1438,862 @@ This project now demonstrates:
 ```
 
 The application therefore provides two API styles over the same underlying domain and persistence model while demonstrating Spring's service, persistence, transaction, exception-handling, SOAP, REST, and AOP capabilities.
+
+
+
+# 36. Automated Testing
+
+The project includes an automated testing suite covering the REST controller, REST service, SOAP service, SOAP endpoint, Spring AOP aspect, and an end-to-end REST integration test.
+
+The testing strategy combines:
+
+- JUnit 5
+- Mockito
+- Spring MockMvc
+- Spring Boot integration testing
+- H2 in-memory database
+- JaCoCo code coverage
+
+This provides multiple levels of testing rather than relying only on manual Postman testing.
+
+The overall testing approach is:
+
+```text
+                    Testing Strategy
+                           │
+          ┌────────────────┴────────────────┐
+          │                                 │
+          ▼                                 ▼
+     Unit Testing                   Integration Testing
+          │                                 │
+          ├── TreeServiceTest               └── TreeRestIntegrationTest
+          │
+          ├── TreeSoapServiceTest
+          │
+          ├── TreeControllerTest
+          │
+          ├── TreeEndpointTest
+          │
+          └── TreeServiceAspectTest
+```
+
+---
+
+# 37. Unit Testing
+
+Unit tests are located under:
+
+```text
+src/test/java/com/testSpring
+```
+
+The project contains tests for the major application layers.
+
+```text
+src
+└── test
+    ├── java
+    │   └── com.testSpring
+    │       │
+    │       ├── TestSpringPersistentApplicationTests.java
+    │       │
+    │       ├── aspect
+    │       │   └── TreeServiceAspectTest.java
+    │       │
+    │       ├── controller
+    │       │   └── TreeControllerTest.java
+    │       │
+    │       ├── endpoint
+    │       │   └── TreeEndpointTest.java
+    │       │
+    │       ├── integration
+    │       │   └── TreeRestIntegrationTest.java
+    │       │
+    │       └── service
+    │           ├── TreeServiceTest.java
+    │           └── TreeSoapServiceTest.java
+    │
+    └── resources
+        └── application.properties
+```
+
+The unit tests isolate individual classes by mocking their dependencies where appropriate.
+
+---
+
+# 38. REST Service Unit Testing
+
+`TreeServiceTest` tests the REST business/service layer.
+
+The repository dependency is mocked using Mockito so that the tests focus on the behavior of `TreeService` rather than communicating with a real database.
+
+The following service operations are tested:
+
+```text
+getAll()
+
+getOne()
+
+addTree()
+
+addMultipleTrees()
+
+update()
+
+patchTree()
+
+deleteTree()
+```
+
+Both successful and failure scenarios are tested.
+
+Examples include:
+
+```text
+Tree exists
+     ↓
+Repository returns TreeModel
+     ↓
+Service returns expected result
+```
+
+and:
+
+```text
+Tree does not exist
+     ↓
+Repository returns empty
+     ↓
+TreeNotFoundException
+```
+
+The tests also verify interactions with `TreeRepository` using Mockito.
+
+---
+
+# 39. SOAP Service Unit Testing
+
+`TreeSoapServiceTest` tests the SOAP-specific service layer.
+
+The following operations are covered:
+
+```text
+getAllTrees()
+
+getTreeById()
+
+addTree()
+
+addMultipleTrees()
+
+updateTree()
+
+patchTree()
+
+deleteTree()
+```
+
+The tests verify:
+
+- successful retrieval
+- missing tree handling
+- creation
+- multiple-tree creation
+- full updates
+- partial updates
+- deletion
+- repository interaction
+
+The SOAP service also initializes the lazily loaded `branches` collection while the Hibernate session is active.
+
+Unit testing this service helps ensure that SOAP-specific business behavior works independently of the SOAP XML transport layer.
+
+---
+
+# 40. REST Controller Unit Testing
+
+`TreeControllerTest` tests the REST API layer using Spring `MockMvc`.
+
+`MockMvc` allows HTTP requests to be simulated without starting an external web server.
+
+The controller is tested for endpoints such as:
+
+```text
+GET     /home
+
+GET     /all
+
+GET     /all/{id}
+
+POST    /add
+
+POST    /addAll
+
+PUT     /update/{id}
+
+PATCH   /patch/{id}
+
+DELETE  /delete/{id}
+
+GET     /count
+```
+
+The tests verify HTTP behavior including:
+
+```text
+HTTP status codes
+
+JSON response bodies
+
+JSON fields
+
+service method calls
+
+success responses
+
+error responses
+```
+
+Conceptually:
+
+```text
+MockMvc
+   │
+   ▼
+TreeController
+   │
+   ▼
+Mock TreeService
+   │
+   ▼
+HTTP / JSON assertions
+```
+
+This tests the REST controller independently from the real database.
+
+---
+
+# 41. SOAP Endpoint Unit Testing
+
+`TreeEndpointTest` tests the SOAP endpoint layer.
+
+It verifies that the endpoint correctly converts between:
+
+```text
+SOAP generated DTO
+        ↕
+TreeModel
+```
+
+The SOAP operations tested include:
+
+```text
+getTree
+
+getAllTrees
+
+addTree
+
+addMultipleTrees
+
+updateTree
+
+patchTree
+
+deleteTree
+```
+
+The tests verify both successful and failure scenarios.
+
+For example:
+
+```text
+DeleteTreeRequest
+       │
+       ▼
+TreeEndpoint
+       │
+       ▼
+TreeSoapService.deleteTree()
+       │
+       ▼
+DeleteTreeResponse
+```
+
+A successful deletion should produce a response containing:
+
+```text
+success = true
+message = Tree deleted successfully!
+```
+
+while a missing tree produces the appropriate failure behavior.
+
+---
+
+# 42. Spring AOP Unit Testing
+
+`TreeServiceAspectTest` tests the AOP logic implemented by:
+
+```text
+TreeServiceAspect
+```
+
+The aspect contains the following advice types:
+
+```text
+@Before
+
+@After
+
+@AfterReturning
+
+@AfterThrowing
+
+@Around
+```
+
+The tests exercise the advice methods and verify that the aspect can process mocked `JoinPoint` and `ProceedingJoinPoint` objects.
+
+The `@Around` advice is especially important because it calls:
+
+```java
+joinPoint.proceed();
+```
+
+to execute the intercepted method while measuring its execution time.
+
+The aspect therefore remains independently testable from the REST and SOAP services.
+
+---
+
+# 43. Integration Testing
+
+In addition to isolated unit tests, the project contains an end-to-end REST integration test:
+
+```text
+TreeRestIntegrationTest
+```
+
+located under:
+
+```text
+src/test/java/com/testSpring/integration
+```
+
+Unlike the controller unit tests, this test loads the Spring application context and exercises multiple real application layers together.
+
+The integration flow is:
+
+```text
+MockMvc HTTP Request
+        │
+        ▼
+TreeController
+        │
+        ▼
+Spring AOP Proxy
+        │
+        ▼
+TreeService
+        │
+        ▼
+TreeRepository
+        │
+        ▼
+Spring Data JPA
+        │
+        ▼
+Hibernate
+        │
+        ▼
+H2 Test Database
+```
+
+This verifies that the layers work correctly together rather than only verifying them independently.
+
+---
+
+# 44. H2 Test Database
+
+The integration test uses an H2 in-memory database.
+
+This is intentionally separate from the MySQL database used when running the actual application.
+
+Production/development runtime:
+
+```text
+Spring Boot
+    │
+    ▼
+MySQL
+```
+
+Automated integration testing:
+
+```text
+Spring Boot Test
+    │
+    ▼
+H2
+```
+
+This prevents integration tests from modifying real MySQL development data.
+
+Test-specific configuration is stored under:
+
+```text
+src/test/resources/application.properties
+```
+
+Spring uses this configuration during testing.
+
+The database exists only for the test lifecycle and can be recreated for subsequent test executions.
+
+---
+
+# 45. REST End-to-End CRUD Integration Test
+
+`TreeRestIntegrationTest` performs a complete REST CRUD lifecycle.
+
+The test verifies that data can move through the complete application stack.
+
+The lifecycle includes operations conceptually equivalent to:
+
+```text
+CREATE
+   │
+   ▼
+READ
+   │
+   ▼
+UPDATE
+   │
+   ▼
+PATCH
+   │
+   ▼
+DELETE
+   │
+   ▼
+VERIFY NOT FOUND
+```
+
+The test exercises the real:
+
+```text
+TreeController
+
+TreeService
+
+TreeRepository
+
+JPA / Hibernate
+
+H2 Database
+
+GlobalExceptionHandler
+
+Spring AOP
+```
+
+rather than replacing the service or repository with Mockito mocks.
+
+This makes it fundamentally different from the controller and service unit tests.
+
+---
+
+# 46. Integration Test CRUD Flow
+
+The complete integration-test flow can be visualized as:
+
+```text
+POST /add
+     │
+     ▼
+Create Tree
+     │
+     ▼
+GET /all/{id}
+     │
+     ▼
+Verify Created Tree
+     │
+     ▼
+PUT /update/{id}
+     │
+     ▼
+Verify Full Update
+     │
+     ▼
+PATCH /patch/{id}
+     │
+     ▼
+Verify Partial Update
+     │
+     ▼
+DELETE /delete/{id}
+     │
+     ▼
+Delete Tree
+     │
+     ▼
+GET /all/{id}
+     │
+     ▼
+TreeNotFoundException
+     │
+     ▼
+GlobalExceptionHandler
+     │
+     ▼
+404 Response
+```
+
+This verifies not only individual endpoints but also that persistence changes made by one operation are visible to subsequent operations.
+
+---
+
+# 47. Testing Exception Handling End-to-End
+
+The REST integration test also exercises the global exception-handling path.
+
+For example, after a tree has been deleted, attempting to retrieve the same tree causes:
+
+```text
+GET /all/{id}
+      │
+      ▼
+TreeController
+      │
+      ▼
+TreeService.getOne()
+      │
+      ▼
+TreeRepository
+      │
+      ▼
+Tree does not exist
+      │
+      ▼
+TreeNotFoundException
+      │
+      ▼
+GlobalExceptionHandler
+      │
+      ▼
+HTTP 404
+```
+
+This verifies that exception handling works correctly when all application layers are connected.
+
+The AOP exception path is also executed during this scenario.
+
+Example console output:
+
+```text
+AOP @AfterThrowing
+Exception in method: getOne
+Exception type: TreeNotFoundException
+Exception message: Tree not found with id: 9001
+
+AOP @After
+Method finished: getOne
+
+AOP @Around
+Method: getOne
+Execution time: ... ms
+```
+
+This confirms that the exception travels through the service AOP proxy and is subsequently handled by the REST exception-handling infrastructure.
+
+---
+
+# 48. Running the Automated Tests
+
+Run all tests using Maven:
+
+```bash
+./mvnw test
+```
+
+or, if Maven is installed globally:
+
+```bash
+mvn test
+```
+
+A successful execution should end with output similar to:
+
+```text
+Tests run: ...
+Failures: 0
+Errors: 0
+Skipped: 0
+
+BUILD SUCCESS
+```
+
+A specific integration test can also be executed independently:
+
+```bash
+./mvnw -Dtest=TreeRestIntegrationTest test
+```
+
+This is useful when developing or debugging the end-to-end REST flow.
+
+---
+
+# 49. JaCoCo Code Coverage
+
+The project uses JaCoCo to measure automated test coverage.
+
+JaCoCo records which application instructions, branches, lines, methods, and classes are executed while the automated tests run.
+
+The project achieved approximately:
+
+```text
+85% overall code coverage
+```
+
+after running the complete automated test suite.
+
+Coverage is generated from a combination of:
+
+```text
+Unit Tests
+    +
+REST Controller Tests
+    +
+SOAP Endpoint Tests
+    +
+Service Tests
+    +
+AOP Tests
+    +
+REST Integration Test
+```
+
+The coverage percentage includes project classes considered by the configured JaCoCo report.
+
+---
+
+# 50. Generating the JaCoCo Report
+
+Run:
+
+```bash
+./mvnw clean test
+```
+
+or:
+
+```bash
+mvn clean test
+```
+
+If the JaCoCo report goal is configured as part of the Maven lifecycle, the build output includes:
+
+```text
+jacoco:report
+```
+
+and output similar to:
+
+```text
+Loading execution data file .../target/jacoco.exec
+
+Analyzed bundle 'TestSpringPersistent' with 29 classes
+
+BUILD SUCCESS
+```
+
+The HTML report is generated under:
+
+```text
+target/site/jacoco/
+```
+
+The main report page is:
+
+```text
+target/site/jacoco/index.html
+```
+
+On macOS it can be opened from the project directory with:
+
+```bash
+open target/site/jacoco/index.html
+```
+
+---
+
+# 51. Understanding the JaCoCo Report
+
+The JaCoCo HTML report provides several coverage measurements.
+
+| Metric | Meaning |
+|---|---|
+| Instructions | JVM bytecode instructions executed by tests |
+| Branches | Conditional branches exercised |
+| Complexity | Cyclomatic complexity coverage |
+| Lines | Source-code lines executed |
+| Methods | Methods executed |
+| Classes | Classes executed |
+
+The HTML report also allows navigation from:
+
+```text
+Project
+   │
+   ▼
+Package
+   │
+   ▼
+Class
+   │
+   ▼
+Method / Source Line
+```
+
+This makes it possible to identify exactly which sections of the application still require additional testing.
+
+---
+
+# 52. Unit Tests vs Integration Test
+
+The project intentionally uses both approaches.
+
+| Unit Tests | Integration Test |
+|---|---|
+| Test classes in isolation | Tests multiple layers together |
+| Dependencies can be mocked | Uses real Spring beans |
+| Mockito | Spring application context |
+| Very fast | More realistic |
+| No real persistence required | Uses H2 persistence |
+| Useful for edge cases | Useful for complete application flow |
+| Tests individual behavior | Tests component interaction |
+
+For example:
+
+```text
+TreeServiceTest
+
+TreeService
+    │
+    ▼
+Mock TreeRepository
+```
+
+compared with:
+
+```text
+TreeRestIntegrationTest
+
+MockMvc
+   │
+   ▼
+TreeController
+   │
+   ▼
+TreeService
+   │
+   ▼
+TreeRepository
+   │
+   ▼
+Hibernate
+   │
+   ▼
+H2
+```
+
+Using both provides significantly better confidence than relying on either approach alone.
+
+---
+
+# 53. Complete Testing Architecture
+
+The final testing architecture of the application is:
+
+```text
+                         TEST SUITE
+                             │
+          ┌──────────────────┴──────────────────┐
+          │                                     │
+          ▼                                     ▼
+      UNIT TESTS                        INTEGRATION TEST
+          │                                     │
+          │                                     ▼
+          │                                  MockMvc
+          │                                     │
+          │                                     ▼
+          │                               TreeController
+          │                                     │
+          │                                     ▼
+          │                               Spring AOP Proxy
+          │                                     │
+          │                                     ▼
+          │                                TreeService
+          │                                     │
+          │                                     ▼
+          │                               TreeRepository
+          │                                     │
+          │                                     ▼
+          │                                  Hibernate
+          │                                     │
+          │                                     ▼
+          │                                     H2
+          │
+          ├── TreeControllerTest
+          │
+          ├── TreeServiceTest
+          │
+          ├── TreeSoapServiceTest
+          │
+          ├── TreeEndpointTest
+          │
+          └── TreeServiceAspectTest
+                             │
+                             ▼
+                           JaCoCo
+                             │
+                             ▼
+                    Code Coverage Report
+                             │
+                             ▼
+                    ~85% Overall Coverage
+```
+
+---
+
+# 54. Testing Features Demonstrated
+
+The project now additionally demonstrates:
+
+- JUnit 5 unit testing
+- Mockito mocking
+- Repository mocking
+- Service-layer unit testing
+- REST controller unit testing
+- SOAP service unit testing
+- SOAP endpoint unit testing
+- Spring AOP unit testing
+- `JoinPoint` testing
+- `ProceedingJoinPoint` testing
+- MockMvc
+- HTTP status assertions
+- JSON response assertions
+- Spring Boot integration testing
+- H2 in-memory database testing
+- Test-specific Spring configuration
+- End-to-end REST CRUD testing
+- Persistence verification
+- Exception-path integration testing
+- AOP execution during integration testing
+- Global exception handling during integration testing
+- JaCoCo code coverage
+- HTML coverage reports
+- Approximately 85% overall automated test coverage
+
+The application therefore demonstrates not only REST, SOAP, persistence, exception handling, transaction management, and AOP, but also a layered automated testing strategy covering both isolated components and integrated application behavior.

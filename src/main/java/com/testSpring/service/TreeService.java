@@ -146,15 +146,15 @@ public class TreeService
 	        {
 	            tree.setName(partialUpdate.getName());
 	        }
-	        
+
 	        if (partialUpdate.getCategory() != null) 
 	        {
 	            tree.setCategory(partialUpdate.getCategory());
 	        }
-	        
-	        if (partialUpdate.getBranches() != null) 
-	        {  
-	            // check for default values
+
+	        if (partialUpdate.getBranches() != null
+	                && !partialUpdate.getBranches().isEmpty()) 
+	        {
 	            tree.setBranches(partialUpdate.getBranches());
 	        }
 
