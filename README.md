@@ -1,6 +1,9 @@
 # Tree Management Application
 
-A Spring Boot application demonstrating a complete **Tree Management System** using both **REST API** and **SOAP Web Services** over the same persistence layer.
+A Spring Boot application demonstrating a complete 
+**Tree Management System** 
+using both **REST API** and **SOAP Web Services** 
+over the same persistence layer.
 
 The project demonstrates:
 
