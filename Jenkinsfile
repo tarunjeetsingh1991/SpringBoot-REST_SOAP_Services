@@ -328,6 +328,7 @@ pipeline {
                         echo "========================================"
 
 
+						JENKINS_NODE_COOKIE=dontKillMe \
 						nohup java \
 						    -Dserver.port=8081 \
 						    -Dspring.datasource.url="jdbc:mysql://localhost:3306/testSpring?useSSL=false" \
@@ -335,7 +336,7 @@ pipeline {
 						    -Dspring.datasource.password="$DB_PASSWORD" \
 						    -Dspring.jpa.hibernate.ddl-auto=update \
 						    -Dspring.jpa.show-sql=true \
-						    -Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect \
+						    -Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect \
 						    -jar "$DEPLOY_DIR/TestSpringPersistent.jar" \
 						    > "$DEPLOY_DIR/application.log" 2>&1 &
 
