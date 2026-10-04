@@ -369,11 +369,14 @@ pipeline {
                 sh '''
                     DEPLOY_DIR="$HOME/jenkins-deploy/TestSpringPersistent"
 
-
                     echo "Waiting for Spring Boot to start..."
 
                     sleep 15
 
+
+                    # ============================================
+                    # VERIFY PID FILE
+                    # ============================================
 
                     if [ ! -f "$DEPLOY_DIR/application.pid" ]; then
 
@@ -392,27 +395,14 @@ pipeline {
                     PID=$(cat "$DEPLOY_DIR/application.pid")
 
 
-                    echo "Checking PID: $PID"
+                    echo "Checking application PID: $PID"
 
 
-                    if kill -0 "$PID" 2>/dev/null; then
+                    # ============================================
+                    # VERIFY JAVA PROCESS
+                    # ============================================
 
-                        echo ""
-                        echo "========================================"
-                        echo "DEPLOYMENT SUCCESSFUL"
-                        echo "========================================"
-
-                        echo "Application is running."
-
-                        echo "PID: $PID"
-
-                        echo "JAR:"
-                        echo "$DEPLOY_DIR/TestSpringPersistent.jar"
-
-                        echo "Log:"
-                        echo "$DEPLOY_DIR/application.log"
-
-                    else
+                    if ! kill -0 "$PID" 2>/dev/null; then
 
                         echo ""
                         echo "========================================"
@@ -432,6 +422,81 @@ pipeline {
                         exit 1
 
                     fi
+
+
+                    echo "Spring Boot process is running."
+
+
+                    # ============================================
+                    # VERIFY REST ENDPOINT
+                    # ============================================
+
+                    echo ""
+                    echo "Checking REST endpoint:"
+                    echo "http://localhost:8081/home"
+
+
+                    RESPONSE=$(curl \
+                        --silent \
+                        --show-error \
+                        --fail \
+                        http://localhost:8081/home)
+
+
+                    echo ""
+                    echo "Response from /home:"
+                    echo "$RESPONSE"
+
+
+                    # ============================================
+                    # VERIFY EXPECTED RESPONSE
+                    # ============================================
+
+                    if [ "$RESPONSE" != "Welcome" ]; then
+
+                        echo ""
+                        echo "========================================"
+                        echo "DEPLOYMENT FAILED"
+                        echo "========================================"
+
+                        echo "Unexpected response from /home."
+
+                        echo "Expected: Welcome"
+                        echo "Actual: $RESPONSE"
+
+                        echo ""
+                        echo "Application log:"
+                        echo "----------------------------------------"
+
+                        cat "$DEPLOY_DIR/application.log" || true
+
+                        echo "----------------------------------------"
+
+                        exit 1
+
+                    fi
+
+
+                    # ============================================
+                    # DEPLOYMENT SUCCESS
+                    # ============================================
+
+                    echo ""
+                    echo "========================================"
+                    echo "DEPLOYMENT SUCCESSFUL"
+                    echo "========================================"
+
+                    echo "Application process is running."
+                    echo "REST endpoint responded successfully."
+
+                    echo ""
+                    echo "PID: $PID"
+
+                    echo "JAR:"
+                    echo "$DEPLOY_DIR/TestSpringPersistent.jar"
+
+                    echo "Log:"
+                    echo "$DEPLOY_DIR/application.log"
                 '''
             }
         }
@@ -544,14 +609,21 @@ pipeline {
                             <li>Previous application instance stopped</li>
                             <li>New Spring Boot JAR deployed</li>
                             <li>Spring Boot application started</li>
-                            <li>Deployment verification passed</li>
-                            <li>Application process is running successfully</li>
+                            <li>Application process verified</li>
+                            <li>REST /home endpoint verified</li>
+                            <li>HTTP deployment verification passed</li>
                         </ul>
 
 
                         <p>
                             <b>Deployment Status:</b>
                             SUCCESS
+                        </p>
+
+
+                        <p>
+                            <b>Application Port:</b>
+                            8081
                         </p>
 
 
@@ -631,7 +703,8 @@ pipeline {
                         <p>
                             One or more CI/CD pipeline stages failed.
                             This may include compilation, testing,
-                            packaging or deployment.
+                            packaging, deployment, or deployment
+                            verification.
                         </p>
 
                         <p>
