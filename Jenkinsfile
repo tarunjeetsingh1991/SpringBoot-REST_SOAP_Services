@@ -328,12 +328,16 @@ pipeline {
                         echo "========================================"
 
 
-                        nohup java \
-                            -Dspring.datasource.username="$DB_USERNAME" \
-                            -Dspring.datasource.password="$DB_PASSWORD" \
-                            -jar "$DEPLOY_DIR/TestSpringPersistent.jar" \
-                            > "$DEPLOY_DIR/application.log" 2>&1 &
-
+						nohup java \
+						    -Dserver.port=8081 \
+						    -Dspring.datasource.url="jdbc:mysql://localhost:3306/testSpring?useSSL=false" \
+						    -Dspring.datasource.username="$DB_USERNAME" \
+						    -Dspring.datasource.password="$DB_PASSWORD" \
+						    -Dspring.jpa.hibernate.ddl-auto=update \
+						    -Dspring.jpa.show-sql=true \
+						    -Dspring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect \
+						    -jar "$DEPLOY_DIR/TestSpringPersistent.jar" \
+						    > "$DEPLOY_DIR/application.log" 2>&1 &
 
                         NEW_PID=$!
 
