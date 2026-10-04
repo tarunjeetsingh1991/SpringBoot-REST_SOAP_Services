@@ -7,7 +7,9 @@ pipeline {
     // ============================================================
 
     environment {
+
         APP_NAME = 'TestSpringPersistent'
+
         EMAIL_RECIPIENT = 'singh.tarunjeet1991@gmail.com'
     }
 
@@ -21,8 +23,7 @@ pipeline {
         // Add timestamps to Jenkins console output
         timestamps()
 
-        // Prevent multiple builds of this project
-        // from running at the same time
+        // Prevent multiple deployments from running simultaneously
         disableConcurrentBuilds()
 
         // Keep only the latest 10 Jenkins builds
@@ -216,6 +217,224 @@ pipeline {
                 )
             }
         }
+
+
+        // ========================================================
+        // STAGE 9 - DEPLOY APPLICATION
+        // ========================================================
+
+        stage('Deploy') {
+
+            steps {
+
+                echo '========================================'
+                echo 'Deploying Spring Boot application'
+                echo '========================================'
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'mysql-local',
+                        usernameVariable: 'DB_USERNAME',
+                        passwordVariable: 'DB_PASSWORD'
+                    )
+                ]) {
+
+                    sh '''
+                        DEPLOY_DIR="$HOME/jenkins-deploy/TestSpringPersistent"
+
+                        echo "Creating deployment directory..."
+
+                        mkdir -p "$DEPLOY_DIR"
+
+
+                        echo ""
+                        echo "========================================"
+                        echo "Stopping previous application"
+                        echo "========================================"
+
+
+                        if [ -f "$DEPLOY_DIR/application.pid" ]; then
+
+                            OLD_PID=$(cat "$DEPLOY_DIR/application.pid")
+
+                            echo "Previous PID: $OLD_PID"
+
+                            if kill -0 "$OLD_PID" 2>/dev/null; then
+
+                                echo "Stopping application..."
+
+                                kill "$OLD_PID"
+
+                                sleep 5
+
+                            else
+
+                                echo "Previous application is not running."
+
+                            fi
+
+                            rm -f "$DEPLOY_DIR/application.pid"
+
+                        else
+
+                            echo "No previous deployment PID found."
+
+                        fi
+
+
+                        echo ""
+                        echo "========================================"
+                        echo "Finding generated JAR"
+                        echo "========================================"
+
+
+                        JAR_FILE=$(find target \
+                            -maxdepth 1 \
+                            -type f \
+                            -name "*.jar" \
+                            ! -name "*.original" \
+                            | head -1)
+
+
+                        if [ -z "$JAR_FILE" ]; then
+
+                            echo "ERROR: No deployable JAR found."
+
+                            exit 1
+
+                        fi
+
+
+                        echo "JAR found:"
+                        echo "$JAR_FILE"
+
+
+                        echo ""
+                        echo "========================================"
+                        echo "Copying JAR to deployment directory"
+                        echo "========================================"
+
+
+                        cp "$JAR_FILE" \
+                           "$DEPLOY_DIR/TestSpringPersistent.jar"
+
+
+                        echo "JAR copied successfully."
+
+
+                        echo ""
+                        echo "========================================"
+                        echo "Starting Spring Boot application"
+                        echo "========================================"
+
+
+                        nohup java \
+                            -Dspring.datasource.username="$DB_USERNAME" \
+                            -Dspring.datasource.password="$DB_PASSWORD" \
+                            -jar "$DEPLOY_DIR/TestSpringPersistent.jar" \
+                            > "$DEPLOY_DIR/application.log" 2>&1 &
+
+
+                        NEW_PID=$!
+
+
+                        echo "$NEW_PID" \
+                            > "$DEPLOY_DIR/application.pid"
+
+
+                        echo "Application started."
+
+                        echo "PID: $NEW_PID"
+
+                        echo "Deployment directory:"
+                        echo "$DEPLOY_DIR"
+                    '''
+                }
+            }
+        }
+
+
+        // ========================================================
+        // STAGE 10 - VERIFY DEPLOYMENT
+        // ========================================================
+
+        stage('Verify Deployment') {
+
+            steps {
+
+                echo '========================================'
+                echo 'Verifying Spring Boot deployment'
+                echo '========================================'
+
+                sh '''
+                    DEPLOY_DIR="$HOME/jenkins-deploy/TestSpringPersistent"
+
+
+                    echo "Waiting for Spring Boot to start..."
+
+                    sleep 15
+
+
+                    if [ ! -f "$DEPLOY_DIR/application.pid" ]; then
+
+                        echo "ERROR: application.pid does not exist."
+
+                        echo ""
+                        echo "Application log:"
+
+                        cat "$DEPLOY_DIR/application.log" || true
+
+                        exit 1
+
+                    fi
+
+
+                    PID=$(cat "$DEPLOY_DIR/application.pid")
+
+
+                    echo "Checking PID: $PID"
+
+
+                    if kill -0 "$PID" 2>/dev/null; then
+
+                        echo ""
+                        echo "========================================"
+                        echo "DEPLOYMENT SUCCESSFUL"
+                        echo "========================================"
+
+                        echo "Application is running."
+
+                        echo "PID: $PID"
+
+                        echo "JAR:"
+                        echo "$DEPLOY_DIR/TestSpringPersistent.jar"
+
+                        echo "Log:"
+                        echo "$DEPLOY_DIR/application.log"
+
+                    else
+
+                        echo ""
+                        echo "========================================"
+                        echo "DEPLOYMENT FAILED"
+                        echo "========================================"
+
+                        echo "Spring Boot process is not running."
+
+                        echo ""
+                        echo "Application log:"
+                        echo "----------------------------------------"
+
+                        cat "$DEPLOY_DIR/application.log" || true
+
+                        echo "----------------------------------------"
+
+                        exit 1
+
+                    fi
+                '''
+            }
+        }
     }
 
 
@@ -268,10 +487,10 @@ pipeline {
 
                     <body>
 
-                        <h2>Jenkins Build Successful</h2>
+                        <h2>Jenkins CI/CD Pipeline Successful</h2>
 
                         <p>
-                            The CI/CD pipeline completed successfully.
+                            The complete CI/CD pipeline completed successfully.
                         </p>
 
                         <table border="1"
@@ -305,7 +524,8 @@ pipeline {
 
                         </table>
 
-                        <h3>Pipeline Results</h3>
+
+                        <h3>Continuous Integration Results</h3>
 
                         <ul>
                             <li>Source code checkout successful</li>
@@ -316,6 +536,24 @@ pipeline {
                             <li>Spring Boot JAR generated</li>
                             <li>JAR archived in Jenkins</li>
                         </ul>
+
+
+                        <h3>Continuous Deployment Results</h3>
+
+                        <ul>
+                            <li>Previous application instance stopped</li>
+                            <li>New Spring Boot JAR deployed</li>
+                            <li>Spring Boot application started</li>
+                            <li>Deployment verification passed</li>
+                            <li>Application process is running successfully</li>
+                        </ul>
+
+
+                        <p>
+                            <b>Deployment Status:</b>
+                            SUCCESS
+                        </p>
+
 
                         <p>
                             <a href="${env.BUILD_URL}">
@@ -357,7 +595,7 @@ pipeline {
 
                     <body>
 
-                        <h2>Jenkins Build Failed</h2>
+                        <h2>Jenkins CI/CD Pipeline Failed</h2>
 
                         <p>
                             The CI/CD pipeline encountered an error.
@@ -389,11 +627,18 @@ pipeline {
 
                         </table>
 
+
                         <p>
-                            One or more pipeline stages failed.
+                            One or more CI/CD pipeline stages failed.
+                            This may include compilation, testing,
+                            packaging or deployment.
+                        </p>
+
+                        <p>
                             Please review the Jenkins console output
                             to identify the problem.
                         </p>
+
 
                         <p>
                             <a href="${env.BUILD_URL}">
@@ -418,6 +663,7 @@ pipeline {
         unstable {
 
             echo 'Build completed with UNSTABLE status.'
+
 
             emailext(
 
